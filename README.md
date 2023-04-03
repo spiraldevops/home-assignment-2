@@ -45,6 +45,8 @@ Additionally, the website requires databases to work:
 
 ## Exercise instructions
 
+- **Warning:** Please do **not** push any code to the public repository. Instead, please fork the repository and submit your solution as a pull request from your fork. This will ensure that your code is not visible to other candidates and that your work remains private.
+
 The exercise consists of three parts:
 
 ### Part 1 - Docker Compose
