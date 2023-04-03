@@ -97,6 +97,6 @@ app.post('/api/values', async (req, res) => {
 });
 
 
-app.listen(keys.serverPort, err => {
-  console.log('Listening on port', keys.serverPort);
+app.listen(5000, err => {
+  console.log('Listening on port 5000');
 });
