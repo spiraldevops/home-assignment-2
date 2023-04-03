@@ -1,1 +1,1 @@
-React APP could run on any open port
+React APP could be exposed on any port.
