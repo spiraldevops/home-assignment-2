@@ -15,7 +15,9 @@ Welcome to Spiral Solutions recruitment process.
 <br>
 You are at the home assignment stage, which should result in a deployment of this beautiful website:
 
-<img src="fib-app.gif#center" alt="Fibonacci site" height=50% width=50%>
+<p align="center"   >
+    <img src="fib-app.gif" alt="Fibonacci site" height=50% width=50%>
+</p>
 
 <br>
 
@@ -43,16 +45,90 @@ Additionally, the website requires databases to work:
 
 ## Setup and authentication
 
+### Tools to install
+
+You will need the following tools for this assignment:
+
+- git
+- [docker](https://docs.docker.com/engine/)
+- [docker compose](https://docs.docker.com/compose/install/linux/)
+- [kubectl](https://kubernetes.io/docs/tasks/tools/) or equivalent
+- [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+
+### Authenticating with aws
+
+Once you have aws-cli installed, run the following command:
+
+```sh
+aws configure --profile spiral
+```
+
+You will be prompted for AWS Access Key ID and AWS Secret Key. Enter the credentials you recieved with the assignment.
+For the region enter *eu-central-1*.
+
+After that, you should be able to get a response to the following command:
+
+```sh
+aws eks list-clusters --profile spiral
+```
+
+### Login to ECR docker registry
+
+After you have [authenticated with aws](#authenticating-with-aws), find the account id by running:
+
+```sh
+aws sts get-caller-identity --profile spiral
+```
+
+Then perform login using the following command:
+
+```sh
+aws ecr get-login-password | docker login --username AWS --password-stdin <account id>.dkr.ecr.eu-central-1.amazonaws.com
+```
+
+### Connecting to the EKS cluster
+
+After you have [authenticated with aws](#authenticating-with-aws), run the following command to add the cluster authentication to your KUBECONFIG file:
+
+```sh
+aws eks update-kubeconfig --profile spiral --name spiral-home-assignment --alias <give the context a name>
+```
+
+You should see the new context in the `kubectl config get-contexts` list.
+
+Run `kubectl config use-context <the name you gave>`. Now you should be able to see and edit the resources within the cluster.
+
 ## Exercise instructions
 
-- **Warning:** Please do **not** push any code to the public repository. Instead, please fork the repository and submit your solution as a pull request from your fork. This will ensure that your code is not visible to other candidates and that your work remains private.
+<div class="warning">
+
+**Warning:**
+
+Please do **not** push any code to the public repository.
+
+Instead, please fork the repository and submit your solution as a pull request from your fork. This will ensure that your code is not visible to other candidates and that your work remains private.
+
+</div>
+
+<style>
+.warning {
+  background-color: FireBrick;
+  border: 1px solid #ffb3b3;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+.warning p {
+  margin: 0;
+}
+</style>
 
 The exercise consists of three parts:
 
 ### Part 1 - Docker Compose
 
-1. Use Docker Compose to build and run the entire application stack (services and databases).
-2. The order in which the services should come up is:
+Use Docker Compose to build and run the entire application stack (services and databases).
+
+1. The order in which the services should come up is:
     1. `mysql` <br>
         **Healthcheck command: `msqladmin ping -h localhost`**
     2. `redis` <br>
@@ -60,15 +136,24 @@ The exercise consists of three parts:
     3. `server`
     4. `worker`
     5. `client`
-3. Use the following ports for each service:
+2. Use the following ports for each service:
    - client: 3000
    - server: 5000
    - mysql: 3306
    - redis: 6379
-4. Verify that the application works as expected by navigating to <http://localhost:3000> in your web browser.
-5. Make sure that data from databases is available after restart (persistent).
+3. Verify that the application works as expected by navigating to <http://localhost:3000> in your web browser.
+4. Make sure that data from databases is available after restart (persistent).
 
 ### Part 2 - Deploying manually to k8s
+
+<div class=warning>
+
+**Important**
+
+Please create a **new namespace** with your name and use it for all deployments.
+Otherwise we will not be able to deferentiate your work from others.
+
+</div>
 
 Create k8s manifests in order to deploy the website to the EKS cluster provided.
 This includes creating the necessary resources (such as pods, deployments, and services) for the website to run on EKS. Provide the necessary steps to deploy the website manually.
@@ -81,32 +166,34 @@ Make sure to use the correct resource type for each service, and use persistent 
 - eksctl
 - etc.
 
+For your convenience, *ingress-nginx-controller* has been installed on the cluster. You are welcome to use *spdevqa.com* domain for exposing the website to the world.
+Otherwise, use port-forwarding to connect to the website through your browser.
+
 ### Part 3 - CI/CD
 
 Create a CI/CD pipeline for the website using a tool of your choosing. The pipeline should:
 
 1. Build and push the Docker images to ECR. **Versioning is highly recommended.**
-
->Login to ECR registry:
-> > ```aws ecr get-login-password | docker login --username AWS --password-stdin 289512055556.dkr.ecr.eu-central-1.amazonaws.com```
-
-2. Deploy the website to an EKS cluster automatically. **Make sure that the image version is passed as an argument.**
-3. Provide the necessary instructions for running the pipeline, if needed.
+    > Login into registry using [previous instructions](#login-to-ecr-docker-registry)
+2. Deploy the website to your namespace in the EKS cluster automatically. **Make sure that the image version is passed as an argument.**
+    > Connect the cluster to your CD tool with the AWS Access Key ID and AWS Secret Key provided. See [previous instructions](#connecting-to-the-eks-cluster)
+3. Provide documentation for running the pipeline, if necessary.
 
 ### Bonuses
 
-For bonus points, you can:
+For bonus points, you can (in no particular order):
 
 - Rewrite the Dockerfiles for server and worker services to be more secure.
 - Configure monitoring for the website using a tool of your choosing (e.g. Prometheus, Grafana)
 - Implement GitOps for the website instead of a CD pipeline.
+- Create versioning and deployment to different namespaces based on a branching strategy.
 
 ## What you are graded on
 
 We will evaluate your submission based on the following criteria:
 
 1. **Functionality**: Your solution should work as intended, deploying the website to the cluster.
-2. **Clarity**: You should be able to explain your implementation to someone else who has a basic understanding of DevOps principles and k8s.
+2. **Understanding**: You should be able to explain your implementation to someone else who has a basic knowledge of DevOps principles and k8s.
 3. **Best practices**: Your implementation should follow industry best practices for DevOps, i.e. scalability, and maintainability.
 4. **Readability and cleanliness**: Your code should be well-organized, well-documented, and easy to read.
 
@@ -116,7 +203,7 @@ Please include your answer to this question in your submission. We are intereste
 
 ## Contacts
 
-If you have any questions or concerns about this project, please feel free to reach out to us at the following email address: 
+If you have any questions or concerns about this project, please feel free to reach out to us at the following email address:
 
 - Email: [spiraldevops@spiralsolutions.com](mailto:spiraldevops@spiralsolutions.com)
 
