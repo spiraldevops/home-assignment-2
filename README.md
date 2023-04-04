@@ -115,3 +115,9 @@ We will evaluate your submission based on the following criteria:
 Please include your answer to this question in your submission. We are interested in learning more about your thought process and the depth of your understanding of the DevOps process.
 
 ## Contacts
+
+If you have any questions or concerns about this project, please feel free to reach out to us at the following email address: 
+
+- Email: [spiraldevops@spiralsolutions.com](mailto:spiraldevops@spiralsolutions.com)
+
+We will do our best to respond to your inquiries as soon as possible. Thank you.
