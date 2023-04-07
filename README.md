@@ -15,7 +15,7 @@ Welcome to Spiral Solutions recruitment process.
 <br>
 You are at the home assignment stage, which should result in a deployment of this beautiful website:
 
-<p align="center"   >
+<p align="center">
     <img src="fib-app.gif" alt="Fibonacci site" height=50% width=50%>
 </p>
 
@@ -83,7 +83,7 @@ aws sts get-caller-identity --profile spiral
 Then perform login using the following command:
 
 ```sh
-aws ecr get-login-password | docker login --username AWS --password-stdin <account id>.dkr.ecr.eu-central-1.amazonaws.com
+aws ecr get-login-password --profile spiral | docker login --username AWS --password-stdin <account id>.dkr.ecr.eu-central-1.amazonaws.com
 ```
 
 ### Connecting to the EKS cluster
@@ -150,7 +150,7 @@ Use Docker Compose to build and run the entire application stack (services and d
 
 **Important**
 
-Please create a **new namespace** with your name and use it for all deployments.
+Please create a **_new namespace_** with your name and use it for all deployments.
 Otherwise we will not be able to deferentiate your work from others.
 
 </div>
@@ -160,7 +160,7 @@ This includes creating the necessary resources (such as pods, deployments, and s
 
 Make sure to use the correct resource type for each service, and use persistent volumes for the databases. You can use any way to create the manifests:
 
-- regular kubernetes yamls/json
+- basic kubernetes yamls/json
 - helm
 - kustomize
 - eksctl
