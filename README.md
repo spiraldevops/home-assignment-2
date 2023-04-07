@@ -7,9 +7,13 @@ Welcome to Spiral Solutions recruitment process.
 <details>
 <summary>Diversity disclaimer</summary>
 
-    We value diversity and inclusivity in our recruitment process and do not discriminate on the basis of race, color, religion, gender, gender identity or expression, sexual orientation, national origin, genetics, disability, age, or veteran status.
+    We value diversity and inclusivity in our recruitment process.
+    We do not discriminate on the basis of race, color, religion, gender, 
+    gender identity or expression, sexual orientation, national origin, genetics, 
+    disability, age, or veteran status.
 
-    If you have any questions or concerns regarding the assignment or the recruitment process, please do not hesitate to contact us. We want to create an equal and fair opportunity for all applicants.
+    If you have any questions or concerns regarding the assignment or the recruitment process,
+    please do not hesitate to contact us. We want to create an equal and fair opportunity for all applicants.
 </details>
 
 <br>
@@ -100,27 +104,9 @@ Run `kubectl config use-context <the name you gave>`. Now you should be able to 
 
 ## Exercise instructions
 
-<div class="warning">
-
-**Warning:**
-
-Please do **not** push any code to the public repository.
-
-Instead, please fork the repository and submit your solution as a pull request from your fork. This will ensure that your code is not visible to other candidates and that your work remains private.
-
-</div>
-
-<style>
-.warning {
-  background-color: FireBrick;
-  border: 1px solid #ffb3b3;
-  padding: 10px;
-  margin-bottom: 20px;
-}
-.warning p {
-  margin: 0;
-}
-</style>
+| ⛔ **Warning**  |
+|:-------------- |
+| Please do **not** push any code to the public repository.<br>Instead, please fork the repository and submit your solution as a pull request from your fork. This will ensure that your code is not visible to other candidates and that your work remains private.    |
 
 The exercise consists of three parts:
 
@@ -146,14 +132,9 @@ Use Docker Compose to build and run the entire application stack (services and d
 
 ### Part 2 - Deploying manually to k8s
 
-<div class=warning>
-
-**Important**
-
-Please create a **_new namespace_** with your name and use it for all deployments.
-Otherwise we will not be able to deferentiate your work from others.
-
-</div>
+| ⚠️ **Important**  |
+|:-------------- |
+| Please create a **_new namespace_** with your name and use it for all deployments.<br>Otherwise we will not be able to deferentiate your work from others.  |
 
 Create k8s manifests in order to deploy the website to the EKS cluster provided.
 This includes creating the necessary resources (such as pods, deployments, and services) for the website to run on EKS. Provide the necessary steps to deploy the website manually.
