@@ -1,0 +1,47 @@
+version: "3.9"
+services:
+  mysql:
+    image: "mysql:latest"
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_USER=myuser
+      - MYSQL_PASSWORD=mypassword
+      - MYSQL_DATABASE=mydata
+    healthcheck:
+      test: mysqladmin ping -h localhost -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+  redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+  server:
+    build: ./server
+    ports:
+      - "5000:5000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - MYSQLUSER=myuser
+      - MYSQLPASSWORD=mypassword
+      - MYSQLDATABASE=mydata
+      - MYSQLHOST=mysql
+      - REDIS_HOST=redis
+  worker:
+    build: ./worker
+    depends_on:
+      - server
+    environment:
+      - REDIS_HOST=redis
+  client:
+    build: ./client
+    ports:
+      - "3000:3000"
+    depends_on:
+      - worker
