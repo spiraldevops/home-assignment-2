@@ -95,7 +95,7 @@ aws ecr get-login-password --profile spiral | docker login --username AWS --pass
 After you have [authenticated with aws](#authenticating-with-aws), run the following command to add the cluster authentication to your KUBECONFIG file:
 
 ```sh
-aws eks update-kubeconfig --profile spiral --name spiral-home-assignment --alias <give the context a name>
+aws eks update-kubeconfig --profile spiral --name home-assignment --alias <give the context a name>
 ```
 
 You should see the new context in the `kubectl config get-contexts` list.
