@@ -9,27 +9,27 @@ server:
     type: ClusterIP
     port: 5000
   image:
-    repository: home-assignment-2-server
+    repository: 289512055556.dkr.ecr.eu-central-1.amazonaws.com/nitaykd-assignment/server
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "latest"
+    tag: "0.0.1"
 
 worker:
   image:
-    repository: home-assignment-2-worker
+    repository: 289512055556.dkr.ecr.eu-central-1.amazonaws.com/nitaykd-assignment/worker
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "latest"
+    tag: "0.0.1"
 
 client:
   service:
     type: ClusterIP
     port: 3000
   image:
-    repository: home-assignment-2-client
+    repository: 289512055556.dkr.ecr.eu-central-1.amazonaws.com/nitaykd-assignment/client
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "latest"
+    tag: "0.0.1"
 
 
 mysql:
