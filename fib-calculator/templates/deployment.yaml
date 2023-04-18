@@ -1,0 +1,191 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fib-calculator.fullname" . }}-server
+  labels:
+    {{- include "fib-calculator.labels" . | nindent 4 }}
+    service: server
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "fib-calculator.selectorLabels" . | nindent 6 }}
+      service: server
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "fib-calculator.selectorLabels" . | nindent 8 }}
+        service: server
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-server
+          image: "{{ .Values.server.image.repository }}:{{ .Values.server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.server.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 5000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: MYSQLPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mysql
+                  key: mysql-password
+            - name: MYSQLUSER
+              value: {{ .Values.mysql.auth.username }}
+            - name: MYSQLDATABASE
+              value: {{ .Values.mysql.auth.database }}
+            - name: MYSQLHOST
+              value: {{ .Release.Name }}-mysql
+            - name: REDIS_HOST
+              value: {{ .Release.Name }}-redis-master
+      initContainers:
+        - name: init-wait-for-dependencies
+          image: docker.io/busybox:latest
+          env:
+            - name: MYSQLHOST
+              value: {{ .Release.Name }}-mysql
+            - name: REDIS_HOST
+              value: {{ .Release.Name }}-redis-master
+          command: 
+            - /bin/sh
+            - -ec
+            - |
+              echo "Checking $MYSQLHOST availablility"
+              until nc -vz $MYSQLHOST:3306; do
+                echo "$MYSQLHOST is unavailable"
+                sleep 5
+              done
+              echo "$MYSQLHOST is up"
+              echo "Checking $REDIS_HOST availablility"
+              until nc -vz $REDIS_HOST:6379; do
+                echo "$REDIS_HOST is unavailable"
+                sleep 5
+              done
+              echo "$REDIS_HOST is up"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fib-calculator.fullname" . }}-worker
+  labels:
+    {{- include "fib-calculator.labels" . | nindent 4 }}
+    service: worker
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "fib-calculator.selectorLabels" . | nindent 6 }}
+      service: worker
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "fib-calculator.selectorLabels" . | nindent 8 }}
+        service: worker
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-worker
+          image: "{{ .Values.worker.image.repository }}:{{ .Values.worker.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.worker.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: REDIS_HOST
+              value: {{ .Release.Name }}-redis-master
+      initContainers:
+        - name: init-wait-for-dependencies
+          image: docker.io/busybox:latest
+          env:
+            - name: REDIS_HOST
+              value: {{ .Release.Name }}-redis-master
+          command: 
+            - /bin/sh
+            - -ec
+            - |
+              echo "Checking $REDIS_HOST availablility"
+              until nc -vz $REDIS_HOST:6379; do
+                echo "$REDIS_HOST is unavailable"
+                sleep 5
+              done
+              echo "$REDIS_HOST is up"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "fib-calculator.fullname" . }}-client
+  labels:
+    {{- include "fib-calculator.labels" . | nindent 4 }}
+    service: client
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "fib-calculator.selectorLabels" . | nindent 6 }}
+      service: client
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "fib-calculator.selectorLabels" . | nindent 8 }}
+        service: client
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-client
+          image: "{{ .Values.client.image.repository }}:{{ .Values.client.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.client.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: REDIS_HOST
+              value: {{ .Release.Name }}-redis-master
+      initContainers:
+        - name: init-wait-for-dependencies
+          image: docker.io/busybox:latest
+          env:
+            - name: SERVER_SERVICE
+              value: {{ include "fib-calculator.fullname" . }}-server
+            - name: SERVER_PORT
+              value: {{ .Values.server.service.port | quote }}
+          command: 
+            - /bin/sh
+            - -ec
+            - |
+              echo "Checking $SERVER_SERVICE availablility"
+              until nc -vz $SERVER_SERVICE:$SERVER_PORT; do
+                echo "$SERVER_SERVICE is unavailable"
+                sleep 5
+              done
+              echo "$SERVER_SERVICE is up"
