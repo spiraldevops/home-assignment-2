@@ -18,6 +18,11 @@ spec:
     volumeMounts:
       - name: varlibcontainers
         mountPath: /var/lib/containers
+  - name: helm
+    image: docker.io/alpine/helm:3.11.3
+    command:
+    - cat
+    tty: true
   volumes:
     - name: varlibcontainers
 '''   
@@ -84,7 +89,7 @@ spec:
   post {
     always {
       container('buildah') {
-        sh "buildah logout ${params.ImageRegistry}"
+        sh "buildah logout ${params.ImageRegistry} || true"
       }
     }
   }
