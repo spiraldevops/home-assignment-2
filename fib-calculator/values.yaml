@@ -35,6 +35,7 @@ client:
 mysql:
   auth:
     username: mysqluser
+    password: mysqlpassword
     database: fib-calculator-database
 
 redis:

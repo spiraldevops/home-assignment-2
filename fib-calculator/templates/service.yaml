@@ -21,6 +21,7 @@ metadata:
   name: {{ include "fib-calculator.fullname" . }}-client
   labels:
     {{- include "fib-calculator.labels" . | nindent 4 }}
+    service: client
 spec:
   type: {{ .Values.client.service.type }}
   ports:

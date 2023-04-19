@@ -40,7 +40,8 @@ spec:
   parameters {
     string(name: 'Version', defaultValue: '0.0.0', description: 'Version for all images')
     string(name: 'ImageRegistry', defaultValue: '289512055556.dkr.ecr.eu-central-1.amazonaws.com', description: 'Registry to push images to')
-    booleanParam(name: 'PushToRegistry', defaultValue: false, description: 'If ture, will push images to registry')
+    booleanParam(name: 'PushToRegistry', defaultValue: true, description: 'If ture, will push images to registry')
+    booleanParam(name: 'Deploy', defaultValue: true, description: 'If ture, will deploy fib-calculator')
   }
   stages {
     stage('Build Server') {
@@ -89,12 +90,19 @@ spec:
     stage('Deploy fib-calculator') {
         when {
         expression { return params.PushToRegistry }
+        expression { return params.Deploy }
       }
       steps {
         container('helm') {
-          sh "helm repo add bitnami https://charts.bitnami.com/bitnami"
-          sh "helm dependency build ./fib-calculator/"
-          sh "helm upgrade --install fib-calculator ./fib-calculator/ -n nitaykd"
+          sh '''
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm dependency build ./fib-calculator/
+          helm upgrade --install fib-calculator ./fib-calculator/ \
+          --wait --timeout 5m0s -n nitaykd --set \
+          server.image.tag=${params.Version},\
+          client.image.tag=${params.Version},\
+          worker.image.tag=${params.Version}
+          '''
         }
       }
     }
