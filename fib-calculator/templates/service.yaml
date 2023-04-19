@@ -14,6 +14,7 @@ spec:
       name: http
   selector:
     {{- include "fib-calculator.selectorLabels" . | nindent 4 }}
+    service: server
 ---
 apiVersion: v1
 kind: Service

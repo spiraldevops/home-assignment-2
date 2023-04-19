@@ -36,6 +36,7 @@ mysql:
   auth:
     username: mysqluser
     password: mysqlpassword
+    rootPassword: mysqlrootpassword
     database: fib-calculator-database
 
 redis:
