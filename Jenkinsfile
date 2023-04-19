@@ -23,6 +23,7 @@ spec:
     command:
     - cat
     tty: true
+  serviceAccountName: jenkins-admin
   volumes:
     - name: varlibcontainers
 '''   
@@ -82,6 +83,18 @@ spec:
           sh "buildah push ${params.ImageRegistry}/nitaykd-assignment/server:${params.Version}"
           sh "buildah push ${params.ImageRegistry}/nitaykd-assignment/client:${params.Version}"
           sh "buildah push ${params.ImageRegistry}/nitaykd-assignment/worker:${params.Version}"
+        }
+      }
+    }
+    stage('Deploy fib-calculator') {
+        when {
+        expression { return params.PushToRegistry }
+      }
+      steps {
+        container('helm') {
+          sh "helm repo add bitnami https://charts.bitnami.com/bitnami"
+          sh "helm dependency build ./fib-calculator/"
+          sh "helm upgrade --install fib-calculator ./fib-calculator/ -n nitaykd"
         }
       }
     }
