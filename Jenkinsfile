@@ -31,41 +31,52 @@ spec:
   environment {
     ECR_CREDS=credentials('ecr-creds')
   }
+  parameters {
+    string(name: 'Version', defaultValue: '0.0.0', description: 'Version for all images')
+    string(name: 'ImageRegistry', defaultValue: '289512055556.dkr.ecr.eu-central-1.amazonaws.com', description: 'Registry to push images to')
+    booleanParam(name: 'PushToRegistry', defaultValue: false, description: 'If ture, will push images to registry')
+  }
   stages {
     stage('Build Server') {
       steps {
         container('buildah') {
-          sh 'buildah build -t 289512055556.dkr.ecr.eu-central-1.amazonaws.com/nitaykd-assignment/server:0.0.2 ./server'
+          sh "buildah build -t ${params.ImageRegistry}/nitaykd-assignment/server:${params.Version} ./server"
         }
       }
     }
     stage('Build Client') {
       steps {
         container('buildah') {
-          sh 'buildah build -t 289512055556.dkr.ecr.eu-central-1.amazonaws.com/nitaykd-assignment/client:0.0.2 ./client'
+          sh "buildah build -t ${params.ImageRegistry}/nitaykd-assignment/client:${params.Version} ./client"
         }
       }
     }
     stage('Build Worker') {
       steps {
         container('buildah') {
-          sh 'buildah build -t 289512055556.dkr.ecr.eu-central-1.amazonaws.com/nitaykd-assignment/worker:0.0.2 ./worker'
+          sh "buildah build -t ${params.ImageRegistry}/nitaykd-assignment/worker:${params.Version} ./worker"
         }
       }
     }
     stage('Login to ECR') {
       steps {
+        when {
+            expression { return params.PushToRegistry }
+        }
         container('buildah') {
-          sh 'echo $ECR_CREDS_PSW | buildah login -u $ECR_CREDS_USR --password-stdin 289512055556.dkr.ecr.eu-central-1.amazonaws.com'
+          sh "echo $ECR_CREDS_PSW | buildah login -u $ECR_CREDS_USR --password-stdin ${params.ImageRegistry}"
         }
       }
     }
     stage('Push images') {
       steps {
+        when {
+            expression { return params.PushToRegistry }
+        }
         container('buildah') {
-          sh 'buildah push 289512055556.dkr.ecr.eu-central-1.amazonaws.com/nitaykd-assignment/server:0.0.2'
-          sh 'buildah push 289512055556.dkr.ecr.eu-central-1.amazonaws.com/nitaykd-assignment/client:0.0.2'
-          sh 'buildah push 289512055556.dkr.ecr.eu-central-1.amazonaws.com/nitaykd-assignment/worker:0.0.2'
+          sh "buildah push ${params.ImageRegistry}/nitaykd-assignment/server:${params.Version}"
+          sh "buildah push ${params.ImageRegistry}/nitaykd-assignment/client:${params.Version}"
+          sh "buildah push ${params.ImageRegistry}/nitaykd-assignment/worker:${params.Version}"
         }
       }
     }
@@ -73,7 +84,7 @@ spec:
   post {
     always {
       container('buildah') {
-        sh 'buildah logout 289512055556.dkr.ecr.eu-central-1.amazonaws.com'
+        sh "buildah logout ${params.ImageRegistry}"
       }
     }
   }
