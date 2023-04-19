@@ -47,21 +47,21 @@ spec:
     stage('Build Server') {
       steps {
         container('buildah') {
-          sh "buildah build -t ${params.ImageRegistry}/nitaykd-assignment/server:${params.Version} ./server"
+          sh 'buildah build -t $ImageRegistry/nitaykd-assignment/server:$Version ./server'
         }
       }
     }
     stage('Build Client') {
       steps {
         container('buildah') {
-          sh "buildah build -t ${params.ImageRegistry}/nitaykd-assignment/client:${params.Version} ./client"
+          sh 'buildah build -t $ImageRegistry/nitaykd-assignment/client:$Version ./client'
         }
       }
     }
     stage('Build Worker') {
       steps {
         container('buildah') {
-          sh "buildah build -t ${params.ImageRegistry}/nitaykd-assignment/worker:${params.Version} ./worker"
+          sh 'buildah build -t $ImageRegistry/nitaykd-assignment/worker:$Version ./worker'
         }
       }
     }
@@ -71,7 +71,7 @@ spec:
       }
       steps {
         container('buildah') {
-          sh "echo $ECR_CREDS_PSW | buildah login -u $ECR_CREDS_USR --password-stdin ${params.ImageRegistry}"
+          sh 'echo $ECR_CREDS_PSW | buildah login -u $ECR_CREDS_USR --password-stdin $ImageRegistry'
         }
       }
     }
@@ -81,9 +81,9 @@ spec:
       }
       steps {
         container('buildah') {
-          sh "buildah push ${params.ImageRegistry}/nitaykd-assignment/server:${params.Version}"
-          sh "buildah push ${params.ImageRegistry}/nitaykd-assignment/client:${params.Version}"
-          sh "buildah push ${params.ImageRegistry}/nitaykd-assignment/worker:${params.Version}"
+          sh 'buildah push $ImageRegistry/nitaykd-assignment/server:$Version'
+          sh 'buildah push $ImageRegistry/nitaykd-assignment/client:$Version'
+          sh 'buildah push $ImageRegistry/nitaykd-assignment/worker:$Version'
         }
       }
     }
@@ -99,9 +99,7 @@ spec:
           helm dependency build ./fib-calculator/
           helm upgrade --install fib-calculator ./fib-calculator/ \
           --wait --timeout 5m0s -n nitaykd --set \
-          server.image.tag=${params.Version},\
-          client.image.tag=${params.Version},\
-          worker.image.tag=${params.Version}
+          server.image.tag=$Version,client.image.tag=$Version,worker.image.tag=$Version
           '''
         }
       }
@@ -110,7 +108,7 @@ spec:
   post {
     always {
       container('buildah') {
-        sh "buildah logout ${params.ImageRegistry} || true"
+        sh "buildah logout $ImageRegistry || true"
       }
     }
   }
