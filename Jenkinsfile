@@ -59,20 +59,20 @@ spec:
       }
     }
     stage('Login to ECR') {
+      when {
+        expression { return params.PushToRegistry }
+      }
       steps {
-        when {
-            expression { return params.PushToRegistry }
-        }
         container('buildah') {
           sh "echo $ECR_CREDS_PSW | buildah login -u $ECR_CREDS_USR --password-stdin ${params.ImageRegistry}"
         }
       }
     }
     stage('Push images') {
+      when {
+        expression { return params.PushToRegistry }
+      }
       steps {
-        when {
-            expression { return params.PushToRegistry }
-        }
         container('buildah') {
           sh "buildah push ${params.ImageRegistry}/nitaykd-assignment/server:${params.Version}"
           sh "buildah push ${params.ImageRegistry}/nitaykd-assignment/client:${params.Version}"
