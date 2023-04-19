@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM docker.io/node:alpine
 WORKDIR "/app"
 COPY ./package.json ./
 RUN npm install
