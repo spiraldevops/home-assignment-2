@@ -168,13 +168,6 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          env:
-            - name: SERVER_URL
-              {{- if .Values.ingress.enabled }}
-              value: http://{{ .Values.ingress.host }}/api/
-              {{- else }}
-              value: http://localhost/api/
-              {{- end }}
       initContainers:
         - name: init-wait-for-dependencies
           image: docker.io/busybox:latest

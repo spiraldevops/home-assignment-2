@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://spdevqa.com/api';
+if (window.location.port == '3000') {
+  axios.defaults.baseURL = `${window.location.protocol}//${window.location.hostname}:5000/api`;
+}
+else {
+  axios.defaults.baseURL = `${window.location.protocol}//${window.location.host}/api`;
+}
 
 class Fib extends Component {
   state = {
