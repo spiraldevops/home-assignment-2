@@ -38,30 +38,42 @@ spec:
     ECR_CREDS=credentials('ecr-creds')
   }
   parameters {
-    string(name: 'Version', defaultValue: '0.0.0', description: 'Version for all images')
+    string(name: 'Version', defaultValue: '', description: 'Version for all images. If left empty, commit hash will be used instead.')
     string(name: 'ImageRegistry', defaultValue: '289512055556.dkr.ecr.eu-central-1.amazonaws.com', description: 'Registry to push images to')
     booleanParam(name: 'PushToRegistry', defaultValue: true, description: 'If ture, will push images to registry')
     booleanParam(name: 'Deploy', defaultValue: true, description: 'If ture, will deploy fib-calculator')
   }
   stages {
+    stage('Calculate Images Tag')
+    {
+        steps{
+            script{
+                env.IMAGES_TAG = params.Version
+                if (params.Version == '')
+                {
+                    env.IMAGES_TAG = sh (script: "git rev-parse HEAD", returnStdout: true)
+                }
+            }
+        }
+    }
     stage('Build Server') {
       steps {
         container('buildah') {
-          sh 'buildah build -t $ImageRegistry/nitaykd-assignment/server:$Version ./server'
+          sh 'buildah build -t $ImageRegistry/nitaykd-assignment/server:$IMAGES_TAG ./server'
         }
       }
     }
     stage('Build Client') {
       steps {
         container('buildah') {
-          sh 'buildah build -t $ImageRegistry/nitaykd-assignment/client:$Version ./client'
+          sh 'buildah build -t $ImageRegistry/nitaykd-assignment/client:$IMAGES_TAG ./client'
         }
       }
     }
     stage('Build Worker') {
       steps {
         container('buildah') {
-          sh 'buildah build -t $ImageRegistry/nitaykd-assignment/worker:$Version ./worker'
+          sh 'buildah build -t $ImageRegistry/nitaykd-assignment/worker:$IMAGES_TAG ./worker'
         }
       }
     }
@@ -81,9 +93,9 @@ spec:
       }
       steps {
         container('buildah') {
-          sh 'buildah push $ImageRegistry/nitaykd-assignment/server:$Version'
-          sh 'buildah push $ImageRegistry/nitaykd-assignment/client:$Version'
-          sh 'buildah push $ImageRegistry/nitaykd-assignment/worker:$Version'
+          sh 'buildah push $ImageRegistry/nitaykd-assignment/server:$IMAGES_TAG'
+          sh 'buildah push $ImageRegistry/nitaykd-assignment/client:$IMAGES_TAG'
+          sh 'buildah push $ImageRegistry/nitaykd-assignment/worker:$IMAGES_TAG'
         }
       }
     }
@@ -99,7 +111,7 @@ spec:
           helm dependency build ./fib-calculator/
           helm upgrade --install fib-calculator ./fib-calculator/ \
           --wait --timeout 5m0s -n nitaykd --set \
-          server.image.tag=$Version,client.image.tag=$Version,worker.image.tag=$Version
+          server.image.tag=$IMAGES_TAG,client.image.tag=$IMAGES_TAG,worker.image.tag=$IMAGES_TAG
           '''
         }
       }

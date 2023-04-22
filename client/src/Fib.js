@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-axios.defaults.baseURL = process.env.SERVER_URL;
+axios.defaults.baseURL = 'http://spdevqa.com/api';
 
 class Fib extends Component {
   state = {
