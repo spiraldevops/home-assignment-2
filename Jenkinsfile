@@ -51,7 +51,7 @@ spec:
                 env.IMAGES_TAG = params.Version
                 if (params.Version == '')
                 {
-                    env.IMAGES_TAG = sh (script: "git rev-parse HEAD", returnStdout: true)
+                    env.IMAGES_TAG = sh (script: "echo -n `git rev-parse HEAD`", returnStdout: true)
                 }
             }
         }
