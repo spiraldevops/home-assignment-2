@@ -147,7 +147,7 @@ Make sure to use the correct resource type for each service, and use persistent 
 - eksctl
 - etc.
 
-For your convenience, *ingress-nginx-controller* has been installed on the cluster. You are welcome to use *spdevqa.com* domain for exposing the website to the world.
+For your convenience, *ingress-nginx-controller* has been installed on the cluster. You are welcome to use *spiralhomework.online* domain for exposing the website to the world.
 Otherwise, use port-forwarding to connect to the website through your browser.
 
 ### Part 3 - CI/CD
@@ -168,7 +168,7 @@ For bonus points, you can (in no particular order):
 - Configure monitoring for the website using a tool of your choosing (e.g. Prometheus, Grafana)
 - Implement GitOps for the website instead of a CD pipeline.
 - Create versioning and deployment to different namespaces based on a branching strategy.
-- Create a public route HTTP or HTTPS to the App by adding subdomain to spiralhomework.online that is hosted in Route53 DNS in your account.
+- Create a public route HTTP or HTTPS to the App by adding subdomain to *spiralhomework.online* that is hosted in Route53 DNS in your account.
 
 ## What you are graded on
 
